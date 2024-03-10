@@ -1,8 +1,7 @@
 package lexer
 
 import (
-	"fmt"
-	"lexer/token"
+    "clex/token"
 )
 
 type Lexer struct {
@@ -38,6 +37,10 @@ func (l* Lexer) peekChar() byte {
     }
 }
 
+func (l* Lexer) matchesWitch(s byte) {
+
+}
+
 func (l *Lexer) NextToken() token.Token {
     var tok token.Token
     l.skipWhitespace()
@@ -64,14 +67,41 @@ func (l *Lexer) NextToken() token.Token {
                 tok = newToken(token.BANG, l.ch, l.line)
             }
         case '-':
-            tok = newToken(token.MINUS, l.ch, l.line)
+            if l.peekChar() == '>' {
+                ch := l.ch
+                l.readChar()
+                literal := string(ch) + string(l.ch)
+
+                tok = token.Token{Type: token.ARROW, Literal: literal, Line: l.line}
+            } else if l.peekChar() == '='{
+                ch := l.ch
+                l.readChar()
+                literal := string(ch) + string(l.ch)
+
+                tok = token.Token{Type: token.MINUS_ASSIGN, Literal: literal, Line: l.line}
+            } else if l.peekChar() == '-' {
+                ch:= l.ch
+                l.readChar()
+                literal := string(ch) + string(l.ch)
+
+                tok = token.Token{Type: token.DECREMENT, Literal: literal, Line: l.line}
+            } else {
+                tok = newToken(token.MINUS, l.ch, l.line)
+            }
         case '/':
+            // div assign
+            // line comment
             tok = newToken(token.SLASH, l.ch, l.line)
         case '*':
+            // mult assign
             tok = newToken(token.ASTERISK, l.ch, l.line)
         case '<':
+            // bit ls
+            // less eq
             tok = newToken(token.LESS_THAN, l.ch, l.line)
         case '>':
+            // bit rs
+            // greater eq
             tok = newToken(token.GREATER_THAN, l.ch, l.line)
         case ';':
             tok = newToken(token.SEMICOLON, l.ch, l.line)
@@ -82,30 +112,55 @@ func (l *Lexer) NextToken() token.Token {
         case ',':
             tok = newToken(token.COMMA, l.ch, l.line)
         case '+':
+            // plus assign
+            // increment
             tok = newToken(token.PLUS, l.ch, l.line)
         case '{':
             tok = newToken(token.LSQUIRLY, l.ch, l.line)
         case '}':
             tok = newToken(token.RSQUIRLY, l.ch, l.line)
+        case '^':
+            //xor assign
+            tok = newToken(token.BIT_XOR, l.ch, l.line)
+        case '|':
+            //or assign
+            // logical or
+            tok = newToken(token.BIT_OR, l.ch, l.line)
+        case '&':
+            // and_Assign
+            // logical and
+            tok = newToken(token.AMPER, l.ch, l.line)
+        case '%':
+            // mod assign
+            tok = newToken(token.MODULO, l.ch, l.line)
+        case '"':
+            tok = newToken(token.QUOTE, l.ch, l.line)
+        case '#':
+            tok = newToken(token.HASH, l.ch, l.line)
+        case '~':
+            tok = newToken(token.BIT_NOT, l.ch, l.line)
+        case '.':
+            tok = newToken(token.POINT, l.ch, l.line)
         case 0:
             tok.Type = token.EOF
             tok.Literal = ""
             tok.Line = l.line
         default:
             if isLetter(l.ch) {
-                fmt.Println(fmt.Sprintf("Looking up for %s \n", string(l.ch)))
+                //fmt.Println(fmt.Sprintf("Looking up for %s \n", string(l.ch)))
                 tok.Literal = l.readIdentifier()
-                fmt.Println(fmt.Sprintf("Identifier is %s \n", tok.Literal))
+                //fmt.Println(fmt.Sprintf("Identifier is %s \n", tok.Literal))
                 tok.Type = token.LookupIdentifier(tok.Literal)
                 tok.Line = l.line
                 return tok
             } else if isDigit(l.ch){
                 tok.Type = token.INT
-                tok.Literal = l.readNumber()
+                tok.Type, tok.Literal = l.readNumber()
                 tok.Line = l.line
                 return tok
             } else {
                 tok = newToken(token.ILLEGAL, l.ch, l.line)
+                // Show error message (?)
             }
     }
 
@@ -151,12 +206,18 @@ func isDigit(ch byte) bool {
 }
 
 
-func (l *Lexer) readNumber() string {
+func (l *Lexer) readNumber() (token.TokenType, string) {
     position := l.position
-    for isDigit(l.ch) {
+    toktype := token.INT
+    countDecimalPoints := 0
+    for isDigit(l.ch) || (l.ch == '.' && countDecimalPoints == 0) {
+        if l.ch == '.' {
+            toktype = token.FLOATING
+            countDecimalPoints = 1
+        }
         l.readChar()
     }
 
-    return l.input[position:l.position]
+    return token.TokenType(toktype), l.input[position:l.position]
         
 }

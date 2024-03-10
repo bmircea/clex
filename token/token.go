@@ -15,14 +15,11 @@ const (
     ILLEGAL = "ILLEGAL"
     EOF = "EOF"
     
+    COMMENT = "COMMENT"
     // Identifiers
     IDENTIFIER = "IDENTIFIER"
     INT = "INT"
-    LONG = "LONG"
-    SHORT = "SHORT"
-    FLOAT = "FLOAT"
-    DOUBLE= "DOUBLE"
-    BOOL = "BOOL"
+    FLOATING = "FLOATING"
     CHAR = "CHAR"
     
     // Operators
@@ -32,9 +29,11 @@ const (
     BANG = "!"
     ASTERISK = "*"
     SLASH = "/"
+    LINE_COMMENT = "//"
+    MODULO = "%"
     INCREMENT = "++"
     DECREMENT = "--"
-
+    POINT = "."
     LESS_THAN = "<"
     GREATER_THAN = ">"
     LTOE = "<="
@@ -45,9 +44,10 @@ const (
     BIT_NOT = "~"
     BIT_LS = "<<"
     BIT_RS = ">>"
-    
+    HASH = "#"    
     LOG_AND = "&&"
-    LOG_OR == "||"
+    LOG_OR = "||"
+    QUOTE = "\""
 
     PLUS_ASSIGN = "+="
     MINUS_ASSIGN = "-="
@@ -160,4 +160,3 @@ func LookupIdentifier(ident string) TokenType {
 
     return IDENTIFIER
 }
-
