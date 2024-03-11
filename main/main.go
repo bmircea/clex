@@ -25,7 +25,7 @@ func main() {
     tok := l.NextToken()
 
     for tok.Type != token.EOF {
-        fmt.Println(fmt.Sprintf("'%s', %s; %d, linia %d", tok.Literal, tok.Type, len(tok.Literal), tok.Line))
+        fmt.Println(fmt.Sprintf("'%s', %s; %d, linia %d", tok.Literal, token.GetCategoryName(tok.Type, tok.Literal), len(tok.Literal), tok.Line))
         tok = l.NextToken()
     } 
 

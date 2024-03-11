@@ -69,11 +69,12 @@ const (
 
     LPAR = "("
     RPAR = ")"
+    LBRACK = "["
+    RBRACK = "]"
     LSQUIRLY = "{"
     RSQUIRLY = "}"
 
     // Keywords
-    FUNCTION = "FUNCTION"
     TRUE = "TRUE"
     FALSE = "FALSE"
     IF = "IF"
@@ -159,4 +160,35 @@ func LookupIdentifier(ident string) TokenType {
     }
 
     return IDENTIFIER
+}
+
+func GetCategoryName(ttype TokenType, lit string) string {
+    // switch
+    switch ttype {
+        case EQUAL, PLUS, MINUS, BANG, ASTERISK, SLASH, LINE_COMMENT, MODULO, INCREMENT, DECREMENT, POINT, LESS_THAN, 
+            GREATER_THAN, LTOE, GTOE, AMPER, BIT_OR, BIT_XOR, BIT_NOT, BIT_LS, BIT_RS, HASH, LOG_AND, LOG_OR, QUOTE, 
+            PLUS_ASSIGN, MINUS_ASSIGN, MULT_ASSIGN, DIV_ASSIGN, MOD_ASSIGN, AND_ASSIGN, OR_ASSIGN, XOR_ASSIGN, 
+            IS_EQ, IS_NOT_EQ, ARROW:
+            return "operator"
+        case COMMA, SEMICOLON, LPAR, RPAR, LSQUIRLY, RSQUIRLY, LBRACK, RBRACK:
+            return "delimiter"
+        case ILLEGAL:
+            return "error"
+        case INT:
+            return "int"
+        case FLOATING:
+            return "floating point value"
+        case CHAR:
+            return "char"
+        case EOF:
+            return "eof"
+        case COMMENT:
+            return "comment"
+    }
+
+    if LookupIdentifier(lit) == IDENTIFIER {
+        return "identifier"
+    } else {
+        return "key_word"
+    }
 }
